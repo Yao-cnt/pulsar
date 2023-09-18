@@ -1,7 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import config.DataConnection;
 import dto.AlarmConditionDTO;
-import dto.AssetMeasurementListDTO;
+import dto.MeasurementConditionListDTO;
 import org.apache.pulsar.functions.api.Context;
 import org.apache.pulsar.functions.api.Function;
 
@@ -18,7 +17,7 @@ public class AssetPQM implements Function<String, String> {
         ObjectMapper mapper = new ObjectMapper();
 
         String assetId = context.getFunctionName();
-        AssetMeasurementListDTO assetMeasurementList = mapper.readValue(input, AssetMeasurementListDTO.class);
+        MeasurementConditionListDTO measurementConditionListDTO = mapper.readValue(input, MeasurementConditionListDTO.class);
 
 
         /*try (Connection connection = DataConnection.getConnection()) {
@@ -30,7 +29,7 @@ public class AssetPQM implements Function<String, String> {
         } catch (SQLException e) {
             e.printStackTrace();
         }*/
-        return null;
+        return input;
     }
 
     private static List<AlarmConditionDTO> fetchAlarmCondition(Connection connection) throws SQLException {
