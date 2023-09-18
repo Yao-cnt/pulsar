@@ -5,13 +5,15 @@ import lombok.Data;
 @Data
 public class MeasurementDTO {
     private String measurementName;
-    private Double measurementValue;
+    private Integer measurementValue;
+    private Boolean isDiscrete;
 
     @Override
     public String toString() {
         return "MeasurementDTO{" +
                 "measurementName='" + measurementName + '\'' +
-                ", measurementValue=" + measurementValue +
+                ", measurementValue=" + measurementValue + '\'' +
+                ", isDiscrete=" + isDiscrete + '\'' +
                 '}';
     }
 }
