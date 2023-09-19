@@ -43,7 +43,7 @@ public class AssetPQM implements Function<String, String> {
         return asset.toString();
     }
 
-    /*public boolean evaluateCondition(ConditionParser conditionParser,
+    public boolean evaluateCondition(ConditionParser conditionParser,
                                      String alarmConditionText,
                                      List<AssetMeasurementExtendedDto> extendedMeasurements) {
         Map<String,String> tokens =  this.createParserTokens(conditionParser, alarmConditionText, extendedMeasurements);
@@ -51,9 +51,10 @@ public class AssetPQM implements Function<String, String> {
         if (conditionText.indexOf(" Between ")>-1) {
             conditionText = conditionText.replace( conditionText.indexOf("and"), conditionText.indexOf("and") + 3," and " + conditionParser.getMeasurementName() + " < ");
         }
+        //ExpressionParser parser = new SpelExpressionParser();
         //return evaluateExpression(tokens, conditionText.toString());
         return true;
-    }*/
+    }
 
     /*private static boolean evaluateExpression(Map<String, String> tokens, String conditionText){
         ExpressionParser parser = new SpelExpressionParser();
@@ -76,7 +77,7 @@ public class AssetPQM implements Function<String, String> {
         return raiseAlarm;
     }*/
 
-    /*private Map<String,String> createParserTokens(ConditionParser conditionParser,
+    private Map<String,String> createParserTokens(ConditionParser conditionParser,
                                                   String alarmConditionText,
                                                   List<AssetMeasurementExtendedDto> extendedMeasurements){
         Map<String, String> tokens = new HashMap<>();
@@ -97,5 +98,5 @@ public class AssetPQM implements Function<String, String> {
             }
         }
         return tokens;
-    }*/
+    }
 }
