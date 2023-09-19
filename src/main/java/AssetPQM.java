@@ -25,19 +25,13 @@ public class AssetPQM implements Function<String, String> {
         String assetId = context.getFunctionName();
         StringBuilder asset = new StringBuilder("Asset Id: " + assetId).append("\n");
         MeasurementConditionListDTO measurementConditionListDTO = mapper.readValue(input, MeasurementConditionListDTO.class);
-        /*measurementConditionListDTO.getConditionParserList().forEach(conditionParser -> {
-            output.append(conditionParser.getMeasurementName()).append(": ")
-                    .append(conditionParser.getMeasurementValue()).append(" when ")
-                    .append(conditionParser.getAlarmConditionDtoList()).append(". ")
-                    .append(conditionParser.isDiscrete()).append("\n");
-        });*/
 
         List<ConditionParser> conditionParserList = measurementConditionListDTO.getConditionParserList();
         conditionParserList.forEach(conditionParser -> {
             StringBuilder measurement = new StringBuilder("Measurement Name: ")
                     .append(conditionParser.getMeasurementName()).append("\n")
                     .append("Measurement Value: ").append(conditionParser.getMeasurementValue()).append("\n");
-            List<AlarmConditionDTO> alarmConditionDtoList = measurementConditionListDTO.getConditionParserList().get(0).getAlarmConditionDtoList();
+            List<AlarmConditionDTO> alarmConditionDtoList = conditionParser.getAlarmConditionDtoList();
             alarmConditionDtoList.forEach(alarmConditionDTO -> {
                 //evaluateCondition(conditionParser, alarmConditionDTO.getAlarmCondition(), conditionParser.getAssetMeasurementExtendedDtoList());
                 measurement.append("Alarm Condition: ").append(alarmConditionDTO.getAlarmCondition())
