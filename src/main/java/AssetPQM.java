@@ -1,5 +1,4 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dto.AlarmConditionDTO;
 import dto.AssetMeasurementExtendedDto;
 import dto.ConditionParser;
 import dto.MeasurementConditionListDTO;
@@ -11,11 +10,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.util.CollectionUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,34 +27,24 @@ public class AssetPQM implements Function<String, String> {
         measurementConditionListDTO.getConditionParserList().forEach(conditionParser -> {
             output.append(conditionParser.getMeasurementName()).append(": ")
                     .append(conditionParser.getMeasurementValue()).append(" when ")
-                    .append(conditionParser.getConditionText()).append(". ")
+                    .append(conditionParser.getAlarmConditionDtoList()).append(". ")
                     .append(conditionParser.isDiscrete()).append("\n");
         });
 
-
-
-        /*try (Connection connection = DataConnection.getConnection()) {
-            System.out.println("Connection to database established");
-            List<AlarmConditionDTO> alarmConditionList = fetchAlarmCondition(connection);
-            for (AlarmConditionDTO alarmConditionDTO : alarmConditionList) {
-                System.out.println(alarmConditionDTO);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }*/
         return output.toString();
     }
 
-    public boolean evaluateCondition(ConditionParser conditionParser, List<AssetMeasurementExtendedDto> extendedMeasurements) {
+    /*public boolean evaluateCondition(ConditionParser conditionParser, List<AssetMeasurementExtendedDto> extendedMeasurements) {
         Map<String,String> tokens =  this.createParserTokens(conditionParser, extendedMeasurements);
         StringBuffer conditionText = new StringBuffer(conditionParser.getConditionText());
         if (conditionText.indexOf(" Between ")>-1) {
             conditionText = conditionText.replace( conditionText.indexOf("and"), conditionText.indexOf("and") + 3," and " + conditionParser.getMeasurementName() + " < ");
         }
-        return evaluateExpression(tokens, conditionText.toString());
-    }
+        //return evaluateExpression(tokens, conditionText.toString());
+        return true;
+    }*/
 
-    private static boolean evaluateExpression(Map<String, String> tokens, String conditionText){
+    /*private static boolean evaluateExpression(Map<String, String> tokens, String conditionText){
         ExpressionParser parser = new SpelExpressionParser();
         boolean raiseAlarm;
         String patternString = StringUtils.join(tokens.keySet(),"|");
@@ -79,9 +63,9 @@ public class AssetPQM implements Function<String, String> {
         Expression exp = parser.parseExpression(sbContextText.toString());
         raiseAlarm = exp.getValue(Boolean.class);
         return raiseAlarm;
-    }
+    }*/
 
-    private Map<String,String> createParserTokens(ConditionParser conditionParser, List<AssetMeasurementExtendedDto> extendedMeasurements){
+    /*private Map<String,String> createParserTokens(ConditionParser conditionParser, List<AssetMeasurementExtendedDto> extendedMeasurements){
         Map<String, String> tokens = new HashMap<String, String>();
         tokens.put(conditionParser.getMeasurementName(), String.valueOf(conditionParser.getMeasurementValue()));
 
@@ -100,23 +84,5 @@ public class AssetPQM implements Function<String, String> {
             }
         }
         return tokens;
-    }
-
-    private static List<AlarmConditionDTO> fetchAlarmCondition(Connection connection) throws SQLException {
-        List<AlarmConditionDTO> alarmConditionDTOList = new ArrayList<>();
-        String query = "SELECT * FROM lntds_alarm_conditions";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                alarmConditionDTOList.add(new AlarmConditionDTO(
-                        resultSet.getInt("conditionId"),
-                        resultSet.getBoolean("enabled"),
-                        resultSet.getString("alarmCondition"),
-                        resultSet.getInt("alarmId")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return alarmConditionDTOList;
-    }
+    }*/
 }

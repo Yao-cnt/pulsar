@@ -3,20 +3,24 @@ package dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ConditionParser {
-    String conditionText;
+    List<AlarmConditionDTO> alarmConditionDtoList;
     Integer measurementValue;
     String measurementName;
     boolean discrete;
+    List<AssetMeasurementExtendedDto> assetMeasurementExtendedDtoList;
 
     @Override
     public String toString() {
         return "ConditionParser{" +
-                "conditionText='" + conditionText + '\'' +
-                ", measurementValue=" + measurementValue + '\'' +
+                "alarmConditionDtoList=" + alarmConditionDtoList +
+                ", measurementValue=" + measurementValue +
                 ", measurementName='" + measurementName + '\'' +
-                ", discrete=" + discrete + '\'' +
+                ", discrete=" + discrete +
+                ", assetMeasurementExtendedDtoList=" + assetMeasurementExtendedDtoList +
                 '}';
     }
 }
