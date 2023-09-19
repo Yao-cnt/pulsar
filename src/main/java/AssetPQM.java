@@ -17,8 +17,14 @@ public class AssetPQM implements Function<String, String> {
         ObjectMapper mapper = new ObjectMapper();
 
         String assetId = context.getFunctionName();
+        StringBuilder output = new StringBuilder("AssetId: " + assetId + " - ");
         MeasurementConditionListDTO measurementConditionListDTO = mapper.readValue(input, MeasurementConditionListDTO.class);
-
+        measurementConditionListDTO.getConditionParserList().forEach(conditionParser -> {
+            output.append(conditionParser.getMeasurementName()).append(": ")
+                    .append(conditionParser.getMeasurementValue()).append(" when ")
+                    .append(conditionParser.getConditionText()).append(". ")
+                    .append(conditionParser.isDiscrete()).append("\n");
+        });
 
         /*try (Connection connection = DataConnection.getConnection()) {
             System.out.println("Connection to database established");
@@ -29,7 +35,7 @@ public class AssetPQM implements Function<String, String> {
         } catch (SQLException e) {
             e.printStackTrace();
         }*/
-        return input;
+        return output.toString();
     }
 
     private static List<AlarmConditionDTO> fetchAlarmCondition(Connection connection) throws SQLException {
