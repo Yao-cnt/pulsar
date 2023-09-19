@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dto.AlarmConditionDTO;
 import dto.AssetMeasurementExtendedDto;
 import dto.ConditionParser;
 import dto.MeasurementConditionListDTO;
@@ -22,21 +23,37 @@ public class AssetPQM implements Function<String, String> {
         ObjectMapper mapper = new ObjectMapper();
 
         String assetId = context.getFunctionName();
-        StringBuilder output = new StringBuilder("AssetId: " + assetId + " - ");
+        StringBuilder asset = new StringBuilder("Asset Id: " + assetId).append("\n");
         MeasurementConditionListDTO measurementConditionListDTO = mapper.readValue(input, MeasurementConditionListDTO.class);
-        measurementConditionListDTO.getConditionParserList().forEach(conditionParser -> {
+        /*measurementConditionListDTO.getConditionParserList().forEach(conditionParser -> {
             output.append(conditionParser.getMeasurementName()).append(": ")
                     .append(conditionParser.getMeasurementValue()).append(" when ")
                     .append(conditionParser.getAlarmConditionDtoList()).append(". ")
                     .append(conditionParser.isDiscrete()).append("\n");
+        });*/
+
+        List<ConditionParser> conditionParserList = measurementConditionListDTO.getConditionParserList();
+        conditionParserList.forEach(conditionParser -> {
+            StringBuilder measurement = new StringBuilder("Measurement Name: ")
+                    .append(conditionParser.getMeasurementName()).append("\n")
+                    .append("Measurement Value: ").append(conditionParser.getMeasurementValue()).append("\n");
+            List<AlarmConditionDTO> alarmConditionDtoList = measurementConditionListDTO.getConditionParserList().get(0).getAlarmConditionDtoList();
+            alarmConditionDtoList.forEach(alarmConditionDTO -> {
+                //evaluateCondition(conditionParser, alarmConditionDTO.getAlarmCondition(), conditionParser.getAssetMeasurementExtendedDtoList());
+                measurement.append("Alarm Condition: ").append(alarmConditionDTO.getAlarmCondition())
+                        .append("If Discrete: ").append(conditionParser.isDiscrete()).append("\n");
+            });
+            asset.append(measurement);
         });
 
-        return output.toString();
+        return asset.toString();
     }
 
-    /*public boolean evaluateCondition(ConditionParser conditionParser, List<AssetMeasurementExtendedDto> extendedMeasurements) {
-        Map<String,String> tokens =  this.createParserTokens(conditionParser, extendedMeasurements);
-        StringBuffer conditionText = new StringBuffer(conditionParser.getConditionText());
+    /*public boolean evaluateCondition(ConditionParser conditionParser,
+                                     String alarmConditionText,
+                                     List<AssetMeasurementExtendedDto> extendedMeasurements) {
+        Map<String,String> tokens =  this.createParserTokens(conditionParser, alarmConditionText, extendedMeasurements);
+        StringBuffer conditionText = new StringBuffer(alarmConditionText);
         if (conditionText.indexOf(" Between ")>-1) {
             conditionText = conditionText.replace( conditionText.indexOf("and"), conditionText.indexOf("and") + 3," and " + conditionParser.getMeasurementName() + " < ");
         }
@@ -65,11 +82,13 @@ public class AssetPQM implements Function<String, String> {
         return raiseAlarm;
     }*/
 
-    /*private Map<String,String> createParserTokens(ConditionParser conditionParser, List<AssetMeasurementExtendedDto> extendedMeasurements){
-        Map<String, String> tokens = new HashMap<String, String>();
+    /*private Map<String,String> createParserTokens(ConditionParser conditionParser,
+                                                  String alarmConditionText,
+                                                  List<AssetMeasurementExtendedDto> extendedMeasurements){
+        Map<String, String> tokens = new HashMap<>();
         tokens.put(conditionParser.getMeasurementName(), String.valueOf(conditionParser.getMeasurementValue()));
 
-        String conditionText = conditionParser.getConditionText();
+        String conditionText = alarmConditionText;
         if (conditionText.contains(" Between ")) {
             tokens.put("Between", " > ");
         } else {
