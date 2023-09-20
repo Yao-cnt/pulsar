@@ -56,7 +56,7 @@ public class AssetPQM implements Function<String, String> {
         return true;
     }
 
-    /*private static boolean evaluateExpression(Map<String, String> tokens, String conditionText){
+    public static boolean evaluateExpression(Map<String, String> tokens, String conditionText){
         ExpressionParser parser = new SpelExpressionParser();
         boolean raiseAlarm;
         String patternString = StringUtils.join(tokens.keySet(),"|");
@@ -75,7 +75,7 @@ public class AssetPQM implements Function<String, String> {
         Expression exp = parser.parseExpression(sbContextText.toString());
         raiseAlarm = exp.getValue(Boolean.class);
         return raiseAlarm;
-    }*/
+    }
 
     private Map<String,String> createParserTokens(ConditionParser conditionParser,
                                                   String alarmConditionText,
