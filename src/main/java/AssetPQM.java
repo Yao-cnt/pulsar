@@ -5,19 +5,17 @@ import dto.ConditionParser;
 import dto.MeasurementConditionListDTO;
 import org.apache.pulsar.functions.api.Context;
 import org.apache.pulsar.functions.api.Function;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.util.CollectionUtils;
+import utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AssetPQM implements Function<String, String> {
+
     @Override
     public String process(String input, Context context) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
@@ -28,14 +26,15 @@ public class AssetPQM implements Function<String, String> {
 
         List<ConditionParser> conditionParserList = measurementConditionListDTO.getConditionParserList();
         conditionParserList.forEach(conditionParser -> {
-            StringBuilder measurement = new StringBuilder("Measurement Name: ")
-                    .append(conditionParser.getMeasurementName()).append("\n")
+            StringBuilder measurement = new StringBuilder("\n")
+                    .append("Measurement Name: ").append(conditionParser.getMeasurementName()).append("\n")
                     .append("Measurement Value: ").append(conditionParser.getMeasurementValue()).append("\n");
             List<AlarmConditionDTO> alarmConditionDtoList = conditionParser.getAlarmConditionDtoList();
             alarmConditionDtoList.forEach(alarmConditionDTO -> {
-                //evaluateCondition(conditionParser, alarmConditionDTO.getAlarmCondition(), conditionParser.getAssetMeasurementExtendedDtoList());
-                measurement.append("Alarm Condition: ").append(alarmConditionDTO.getAlarmCondition())
-                        .append("If Discrete: ").append(conditionParser.isDiscrete()).append("\n");
+                boolean trigger = evaluateCondition(conditionParser, alarmConditionDTO.getAlarmCondition(), conditionParser.getAssetMeasurementExtendedDtoList(), assetId);
+                measurement.append("Alarm Condition: ").append(alarmConditionDTO.getAlarmCondition()).append("\n")
+                        .append("If Discrete: ").append(conditionParser.isDiscrete()).append("\n")
+                        .append("If Triggered: ").append(trigger).append("\n");
             });
             asset.append(measurement);
         });
@@ -45,21 +44,20 @@ public class AssetPQM implements Function<String, String> {
 
     public boolean evaluateCondition(ConditionParser conditionParser,
                                      String alarmConditionText,
-                                     List<AssetMeasurementExtendedDto> extendedMeasurements) {
-        Map<String,String> tokens =  this.createParserTokens(conditionParser, alarmConditionText, extendedMeasurements);
+                                     List<AssetMeasurementExtendedDto> extendedMeasurements,
+                                     String assetId) {
+        Map<String,String> tokens =  this.createParserTokens(conditionParser, alarmConditionText, extendedMeasurements, assetId);
         StringBuffer conditionText = new StringBuffer(alarmConditionText);
         if (conditionText.indexOf(" Between ")>-1) {
             conditionText = conditionText.replace( conditionText.indexOf("and"), conditionText.indexOf("and") + 3," and " + conditionParser.getMeasurementName() + " < ");
         }
-        //ExpressionParser parser = new SpelExpressionParser();
-        //return evaluateExpression(tokens, conditionText.toString());
-        return true;
+        return evaluateExpression(tokens, conditionText.toString());
     }
 
-    public static boolean evaluateExpression(Map<String, String> tokens, String conditionText){
-        ExpressionParser parser = new SpelExpressionParser();
-        boolean raiseAlarm;
+    private static boolean evaluateExpression(Map<String, String> tokens, String conditionText) {
+        boolean raiseAlarm = false;
         String patternString = StringUtils.join(tokens.keySet(),"|");
+        //org.apache.commons.lang.StringUtils.join(tokens.keySet(), "|")
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher(conditionText);
 
@@ -72,16 +70,15 @@ public class AssetPQM implements Function<String, String> {
         matcher.appendTail(sbContextText);
 
         //Evaluate  the expression.
-        Expression exp = parser.parseExpression(sbContextText.toString());
-        raiseAlarm = exp.getValue(Boolean.class);
         return raiseAlarm;
     }
 
     private Map<String,String> createParserTokens(ConditionParser conditionParser,
                                                   String alarmConditionText,
-                                                  List<AssetMeasurementExtendedDto> extendedMeasurements){
+                                                  List<AssetMeasurementExtendedDto> extendedMeasurements,
+                                                  String assetId){
         Map<String, String> tokens = new HashMap<>();
-        tokens.put(conditionParser.getMeasurementName(), String.valueOf(conditionParser.getMeasurementValue()));
+        tokens.put(assetId + "." + conditionParser.getMeasurementName(), String.valueOf(conditionParser.getMeasurementValue()));
 
         String conditionText = alarmConditionText;
         if (conditionText.contains(" Between ")) {
@@ -90,7 +87,7 @@ public class AssetPQM implements Function<String, String> {
             //Use alarm measurement extended logic to fetch for digital data.
             if (conditionParser.isDiscrete()) {
                 tokens.put("Is", "==");
-                if (!CollectionUtils.isEmpty(extendedMeasurements)) {
+                if (!extendedMeasurements.isEmpty()) {
                     extendedMeasurements.forEach(extendedMeasurement -> {
                         tokens.put(extendedMeasurement.getInterpreteMap(), extendedMeasurement.getValue().toString());
                     });
