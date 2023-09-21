@@ -10,9 +10,10 @@ import utils.StringUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static utils.EvaluateInequality.evaluateInequality;
 
 public class AssetPQM implements Function<String, String> {
 
@@ -49,15 +50,13 @@ public class AssetPQM implements Function<String, String> {
         Map<String,String> tokens =  this.createParserTokens(conditionParser, alarmConditionText, extendedMeasurements, assetId);
         StringBuffer conditionText = new StringBuffer(alarmConditionText);
         if (conditionText.indexOf(" Between ")>-1) {
-            conditionText = conditionText.replace( conditionText.indexOf("and"), conditionText.indexOf("and") + 3," and " + conditionParser.getMeasurementName() + " < ");
+            conditionText = conditionText.replace(conditionText.indexOf("and"), conditionText.indexOf("and") + 3,"and " + assetId + "." + conditionParser.getMeasurementName() + " <");
         }
         return evaluateExpression(tokens, conditionText.toString());
     }
 
     private static boolean evaluateExpression(Map<String, String> tokens, String conditionText) {
-        boolean raiseAlarm = false;
         String patternString = StringUtils.join(tokens.keySet(),"|");
-        //org.apache.commons.lang.StringUtils.join(tokens.keySet(), "|")
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher(conditionText);
 
@@ -69,8 +68,15 @@ public class AssetPQM implements Function<String, String> {
         }
         matcher.appendTail(sbContextText);
 
-        //Evaluate  the expression.
-        return raiseAlarm;
+        /* Evaluate  the expression. */
+        if (sbContextText.indexOf(" and ")>-1) {
+            String[] inequalitiesArray = sbContextText.toString().split(" and ");
+            boolean raiseAlarm1 = evaluateInequality(inequalitiesArray[0]);
+            boolean raiseAlarm2 = evaluateInequality(inequalitiesArray[1]);
+            return raiseAlarm1 && raiseAlarm2;
+        } else {
+            return evaluateInequality(sbContextText.toString());
+        }
     }
 
     private Map<String,String> createParserTokens(ConditionParser conditionParser,
@@ -80,9 +86,8 @@ public class AssetPQM implements Function<String, String> {
         Map<String, String> tokens = new HashMap<>();
         tokens.put(assetId + "." + conditionParser.getMeasurementName(), String.valueOf(conditionParser.getMeasurementValue()));
 
-        String conditionText = alarmConditionText;
-        if (conditionText.contains(" Between ")) {
-            tokens.put("Between", " > ");
+        if (alarmConditionText.contains(" Between ")) {
+            tokens.put("Between", ">");
         } else {
             //Use alarm measurement extended logic to fetch for digital data.
             if (conditionParser.isDiscrete()) {
