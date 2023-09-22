@@ -43,6 +43,7 @@ public class AssetPQM implements Function<String, String> {
         return asset.toString();
     }
 
+    //TODO: evaluate condition need to move to a separate class
     public boolean evaluateCondition(ConditionParser conditionParser,
                                      String alarmConditionText,
                                      List<AssetMeasurementExtendedDto> extendedMeasurements,
