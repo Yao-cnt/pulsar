@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.*;
 import org.apache.pulsar.functions.api.Context;
@@ -16,9 +17,8 @@ public class AssetPQM implements Function<String, String> {
 
         String assetId = context.getFunctionName();
         assetCondition.setAssetId(assetId);
-        MeasurementConditionListDTO measurementConditionListDTO = mapper.readValue(input, MeasurementConditionListDTO.class);
 
-        List<ConditionParser> conditionParserList = measurementConditionListDTO.getConditionParserList();
+        List<ConditionParser> conditionParserList = mapper.readValue(input, new TypeReference<ArrayList<ConditionParser>>() {});
         conditionParserList.forEach(conditionParser -> {
             Measurement measurement1 = new Measurement();
             measurement1.setMeasurementName(conditionParser.getMeasurementName());
