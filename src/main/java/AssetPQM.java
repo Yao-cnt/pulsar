@@ -20,21 +20,25 @@ public class AssetPQM implements Function<String, String> {
 
         List<ConditionParser> conditionParserList = mapper.readValue(input, new TypeReference<ArrayList<ConditionParser>>() {});
         conditionParserList.forEach(conditionParser -> {
-            Measurement measurement1 = new Measurement();
-            measurement1.setMeasurementName(conditionParser.getMeasurementName());
-            measurement1.setMeasurementValue(conditionParser.getMeasurementValue());
+            Measurement measurement = new Measurement();
+            measurement.setMeasurementName(conditionParser.getMeasurementName());
+            measurement.setMeasurementValue(conditionParser.getMeasurementValue());
             List<AlarmConditionDTO> alarmConditionDtoList = conditionParser.getAlarmConditionDtoList();
             List<AlarmCondition> alarmConditions = new ArrayList<>();
             alarmConditionDtoList.forEach(alarmConditionDTO -> {
                 AlarmCondition alarmCondition = new AlarmCondition();
-                boolean trigger = EvaluateAlarmCondition.evaluateCondition(conditionParser, alarmConditionDTO.getAlarmCondition(), conditionParser.getAssetMeasurementExtendedDtoList(), assetId);
+                boolean trigger = EvaluateAlarmCondition.evaluateCondition(
+                        conditionParser,
+                        alarmConditionDTO.getAlarmCondition(),
+                        conditionParser.getAssetMeasurementExtendedDtoList(),
+                        assetId);
                 alarmCondition.setCondition(alarmConditionDTO.getAlarmCondition());
                 alarmCondition.setDiscrete(conditionParser.isDiscrete());
                 alarmCondition.setTriggered(trigger);
                 alarmConditions.add(alarmCondition);
             });
-            measurement1.setAlarmConditions(alarmConditions);
-            measurements.add(measurement1);
+            measurement.setAlarmConditions(alarmConditions);
+            measurements.add(measurement);
         });
         assetCondition.setMeasurements(measurements);
         return mapper.writeValueAsString(assetCondition);
