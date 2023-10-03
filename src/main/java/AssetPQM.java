@@ -1,4 +1,3 @@
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.*;
 import org.apache.pulsar.functions.api.Context;
@@ -15,11 +14,12 @@ public class AssetPQM implements Function<String, String> {
         AssetCondition assetCondition = new AssetCondition();
         List<Measurement> measurements = new ArrayList<>();
 
-        String assetId = context.getFunctionName();
-        assetCondition.setAssetId(assetId);
+        ConditionParserList conditionParserList = mapper.readValue(input, ConditionParserList.class);
+        assetCondition.setAssetId(conditionParserList.getAssetId());
+        assetCondition.setLatitude(conditionParserList.getLatitude());
+        assetCondition.setLongitude(conditionParserList.getLongitude());
 
-        List<ConditionParser> conditionParserList = mapper.readValue(input, new TypeReference<ArrayList<ConditionParser>>() {});
-        conditionParserList.forEach(conditionParser -> {
+        conditionParserList.getConditionParserList().forEach(conditionParser -> {
             Measurement measurement = new Measurement();
             measurement.setMeasurementName(conditionParser.getMeasurementName());
             measurement.setMeasurementValue(conditionParser.getMeasurementValue());
@@ -31,7 +31,7 @@ public class AssetPQM implements Function<String, String> {
                         conditionParser,
                         alarmConditionDTO.getAlarmCondition(),
                         conditionParser.getAssetMeasurementExtendedDtoList(),
-                        assetId);
+                        conditionParserList.getAssetId());
                 alarmCondition.setCondition(alarmConditionDTO.getAlarmCondition());
                 alarmCondition.setSeverity(alarmConditionDTO.getSeverity());
                 alarmCondition.setDiscrete(conditionParser.isDiscrete());
