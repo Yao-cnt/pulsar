@@ -33,6 +33,7 @@ public class AssetPQM implements Function<String, String> {
                         conditionParser.getAssetMeasurementExtendedDtoList(),
                         assetId);
                 alarmCondition.setCondition(alarmConditionDTO.getAlarmCondition());
+                alarmCondition.setSeverity(alarmConditionDTO.getSeverity());
                 alarmCondition.setDiscrete(conditionParser.isDiscrete());
                 alarmCondition.setTriggered(trigger);
                 alarmConditions.add(alarmCondition);
