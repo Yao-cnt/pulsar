@@ -6,6 +6,8 @@ import lombok.Data;
 public class AlarmCondition {
     private String condition;
     private String severity;
+    private Integer alarmId;
+    private String alarmName;
     private boolean isDiscrete;
     private boolean isTriggered;
 
@@ -14,6 +16,8 @@ public class AlarmCondition {
         return "AlarmCondition{" +
                 "condition='" + condition + '\'' +
                 ", severity='" + severity + '\'' +
+                ", alarmId=" + alarmId + '\'' +
+                ", alarmName='" + alarmName + '\'' +
                 ", isDiscrete=" + isDiscrete + '\'' +
                 ", isTriggered=" + isTriggered + '\'' +
                 '}';

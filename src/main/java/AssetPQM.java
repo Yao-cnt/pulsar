@@ -34,6 +34,8 @@ public class AssetPQM implements Function<String, String> {
                         conditionParserList.getAssetId());
                 alarmCondition.setCondition(alarmConditionDTO.getAlarmCondition());
                 alarmCondition.setSeverity(alarmConditionDTO.getSeverity());
+                alarmCondition.setAlarmId(alarmConditionDTO.getAlarmId());
+                alarmCondition.setAlarmName(alarmConditionDTO.getAlarmName());
                 alarmCondition.setDiscrete(conditionParser.isDiscrete());
                 alarmCondition.setTriggered(trigger);
                 alarmConditions.add(alarmCondition);
