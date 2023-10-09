@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ConditionParserList {
+public class AssetConditionDTO {
     private String assetId;
     private String latitude;
     private String longitude;

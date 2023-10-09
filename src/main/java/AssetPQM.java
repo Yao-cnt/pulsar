@@ -14,12 +14,12 @@ public class AssetPQM implements Function<String, String> {
         AssetCondition assetCondition = new AssetCondition();
         List<Measurement> measurements = new ArrayList<>();
 
-        ConditionParserList conditionParserList = mapper.readValue(input, ConditionParserList.class);
-        assetCondition.setAssetId(conditionParserList.getAssetId());
-        assetCondition.setLatitude(conditionParserList.getLatitude());
-        assetCondition.setLongitude(conditionParserList.getLongitude());
+        AssetConditionDTO assetConditionDTO = mapper.readValue(input, AssetConditionDTO.class);
+        assetCondition.setAssetId(assetConditionDTO.getAssetId());
+        assetCondition.setLatitude(assetConditionDTO.getLatitude());
+        assetCondition.setLongitude(assetConditionDTO.getLongitude());
 
-        conditionParserList.getConditionParserList().forEach(conditionParser -> {
+        assetConditionDTO.getConditionParserList().forEach(conditionParser -> {
             Measurement measurement = new Measurement();
             measurement.setMeasurementName(conditionParser.getMeasurementName());
             measurement.setMeasurementValue(conditionParser.getMeasurementValue());
@@ -31,7 +31,8 @@ public class AssetPQM implements Function<String, String> {
                         conditionParser,
                         alarmConditionDTO.getAlarmCondition(),
                         conditionParser.getAssetMeasurementExtendedDtoList(),
-                        conditionParserList.getAssetId());
+                        assetConditionDTO.getAssetId());
+                alarmCondition.setConditionId(alarmConditionDTO.getConditionId());
                 alarmCondition.setCondition(alarmConditionDTO.getAlarmCondition());
                 alarmCondition.setSeverity(alarmConditionDTO.getSeverity());
                 alarmCondition.setAlarmId(alarmConditionDTO.getAlarmId());

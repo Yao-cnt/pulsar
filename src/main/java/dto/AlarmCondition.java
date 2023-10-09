@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class AlarmCondition {
+    private Integer conditionId;
     private String condition;
     private String severity;
     private Integer alarmId;
@@ -14,6 +15,7 @@ public class AlarmCondition {
     @Override
     public String toString() {
         return "AlarmCondition{" +
+                "conditionId=" + conditionId + '\'' +
                 "condition='" + condition + '\'' +
                 ", severity='" + severity + '\'' +
                 ", alarmId=" + alarmId + '\'' +
