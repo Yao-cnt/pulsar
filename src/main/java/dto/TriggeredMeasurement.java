@@ -5,17 +5,17 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Measurement {
+public class TriggeredMeasurement {
     private String measurementName;
     private Integer measurementValue;
-    private List<AlarmCondition> alarmConditions;
+    private List<TriggeredAlarmCondition> triggeredAlarmConditions;
 
     @Override
     public String toString() {
-        return "Measurement{" +
+        return "TriggeredMeasurement{" +
                 "measurementName='" + measurementName + '\'' +
                 ", measurementValue=" + measurementValue + '\'' +
-                ", alarmConditions=" + alarmConditions + '\'' +
+                ", alarmConditions=" + triggeredAlarmConditions + '\'' +
                 '}';
     }
 }

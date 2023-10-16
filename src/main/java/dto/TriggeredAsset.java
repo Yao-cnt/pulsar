@@ -5,19 +5,19 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AssetCondition {
+public class TriggeredAsset {
     private String assetId;
     private String latitude;
     private String longitude;
-    private List<Measurement> measurements;
+    private List<TriggeredMeasurement> triggeredMeasurements;
 
     @Override
     public String toString() {
-        return "AssetCondition{" +
+        return "TriggeredAsset{" +
                 "assetId='" + assetId + '\'' +
                 ", latitude='" + latitude + '\'' +
                 ", longitude='" + longitude + '\'' +
-                ", measurements=" + measurements + '\'' +
+                ", measurements=" + triggeredMeasurements + '\'' +
                 '}';
     }
 }

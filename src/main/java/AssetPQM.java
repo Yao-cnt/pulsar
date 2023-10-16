@@ -11,40 +11,40 @@ public class AssetPQM implements Function<String, String> {
     @Override
     public String process(String input, Context context) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        AssetCondition assetCondition = new AssetCondition();
-        List<Measurement> measurements = new ArrayList<>();
+        TriggeredAsset triggeredAsset = new TriggeredAsset();
+        List<TriggeredMeasurement> triggeredMeasurements = new ArrayList<>();
 
         AssetConditionDTO assetConditionDTO = mapper.readValue(input, AssetConditionDTO.class);
-        assetCondition.setAssetId(assetConditionDTO.getAssetId());
-        assetCondition.setLatitude(assetConditionDTO.getLatitude());
-        assetCondition.setLongitude(assetConditionDTO.getLongitude());
+        triggeredAsset.setAssetId(assetConditionDTO.getAssetId());
+        triggeredAsset.setLatitude(assetConditionDTO.getLatitude());
+        triggeredAsset.setLongitude(assetConditionDTO.getLongitude());
 
         assetConditionDTO.getConditionParserList().forEach(conditionParser -> {
-            Measurement measurement = new Measurement();
-            measurement.setMeasurementName(conditionParser.getMeasurementName());
-            measurement.setMeasurementValue(conditionParser.getMeasurementValue());
+            TriggeredMeasurement triggeredMeasurement = new TriggeredMeasurement();
+            triggeredMeasurement.setMeasurementName(conditionParser.getMeasurementName());
+            triggeredMeasurement.setMeasurementValue(conditionParser.getMeasurementValue());
             List<AlarmConditionDTO> alarmConditionDtoList = conditionParser.getAlarmConditionDtoList();
-            List<AlarmCondition> alarmConditions = new ArrayList<>();
+            List<TriggeredAlarmCondition> triggeredAlarmConditions = new ArrayList<>();
             alarmConditionDtoList.forEach(alarmConditionDTO -> {
-                AlarmCondition alarmCondition = new AlarmCondition();
+                TriggeredAlarmCondition triggeredAlarmCondition = new TriggeredAlarmCondition();
                 boolean trigger = EvaluateAlarmCondition.evaluateCondition(
                         conditionParser,
                         alarmConditionDTO.getAlarmCondition(),
                         conditionParser.getAssetMeasurementExtendedDtoList(),
                         assetConditionDTO.getAssetId());
-                alarmCondition.setConditionId(alarmConditionDTO.getConditionId());
-                alarmCondition.setCondition(alarmConditionDTO.getAlarmCondition());
-                alarmCondition.setSeverity(alarmConditionDTO.getSeverity());
-                alarmCondition.setAlarmId(alarmConditionDTO.getAlarmId());
-                alarmCondition.setAlarmName(alarmConditionDTO.getAlarmName());
-                alarmCondition.setDiscrete(conditionParser.isDiscrete());
-                alarmCondition.setTriggered(trigger);
-                alarmConditions.add(alarmCondition);
+                triggeredAlarmCondition.setConditionId(alarmConditionDTO.getConditionId());
+                triggeredAlarmCondition.setCondition(alarmConditionDTO.getAlarmCondition());
+                triggeredAlarmCondition.setSeverity(alarmConditionDTO.getSeverity());
+                triggeredAlarmCondition.setAlarmId(alarmConditionDTO.getAlarmId());
+                triggeredAlarmCondition.setAlarmName(alarmConditionDTO.getAlarmName());
+                triggeredAlarmCondition.setDiscrete(conditionParser.isDiscrete());
+                triggeredAlarmCondition.setTriggered(trigger);
+                triggeredAlarmConditions.add(triggeredAlarmCondition);
             });
-            measurement.setAlarmConditions(alarmConditions);
-            measurements.add(measurement);
+            triggeredMeasurement.setTriggeredAlarmConditions(triggeredAlarmConditions);
+            triggeredMeasurements.add(triggeredMeasurement);
         });
-        assetCondition.setMeasurements(measurements);
-        return mapper.writeValueAsString(assetCondition);
+        triggeredAsset.setTriggeredMeasurements(triggeredMeasurements);
+        return mapper.writeValueAsString(triggeredAsset);
     }
 }

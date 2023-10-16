@@ -3,7 +3,7 @@ package dto;
 import lombok.Data;
 
 @Data
-public class AlarmCondition {
+public class TriggeredAlarmCondition {
     private Integer conditionId;
     private String condition;
     private String severity;
@@ -14,7 +14,7 @@ public class AlarmCondition {
 
     @Override
     public String toString() {
-        return "AlarmCondition{" +
+        return "TriggeredAlarmCondition{" +
                 "conditionId=" + conditionId + '\'' +
                 "condition='" + condition + '\'' +
                 ", severity='" + severity + '\'' +
